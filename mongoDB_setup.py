@@ -6,10 +6,11 @@ from pymongo.mongo_client import MongoClient
 load_dotenv()
 
 # Get MongoDB URI
-uri = os.getenv("MONGODB_URI")
+url = os.getenv("MONGODB_URL")
+print(f"MongoDB URL: {url}")
 
 # Create MongoDB client
-client = MongoClient(uri)
+client = MongoClient(url)
 
 # Test connection
 try:
