@@ -27,8 +27,8 @@ data ingestion constant start from "DATA_INGESTION" variable name:
     - train test split ratio
 """
 
-DATA_INGESTION_COLLECTION_NAME: str = "NetworkSecurity"
-DATA_INGESTION_DATABASE_NAME: str = "ETL-project"
+DATA_INGESTION_COLLECTION_NAME: str = "PhishingData"
+DATA_INGESTION_DATABASE_NAME: str = "NetworkSecurity"
 DATA_INGESTION_DIR_NAME: str = "data_ingestion"
 DATA_INGESTION_FEATURE_STORE_DIR: str = "feature_store"
 DATA_INGESTION_INGESTED_DIR: str = "ingested"
