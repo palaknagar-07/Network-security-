@@ -36,17 +36,17 @@ class NetworkDataExctract:
 
     def insert_data_to_mongoDB(self, records, database_name, collection_name):
         try:
-            # Force local MongoDB connection to avoid DNS issues
-            self.client = pymongo.MongoClient("mongodb://localhost:27017", ssl=False)
-            
+            self.client = pymongo.MongoClient(URL, tlsCAFile=ca)
+
             self.db = self.client[database_name]
             self.collection = self.db[collection_name]
+
             self.collection.insert_many(records)
+
             return f"Data inserted successfully and No. of records inserted: {len(records)}"
 
         except Exception as e:
-
-            raise NetworkSecurityException(e, sys)         
+            raise NetworkSecurityException(e, sys)        
 
 
 if __name__ == "__main__":
