@@ -1,18 +1,14 @@
 import os
-import sys
-import pandas as pd
 import numpy as np
 
-
-'''
-Some common constants are defined here
-
-'''
-TARGET_COLUMN: str = "Result"
+"""
+defining common constant variable for training pipeline
+"""
+TARGET_COLUMN = "Result"
 PIPELINE_NAME: str = "NetworkSecurity"
+ARTIFACT_DIR: str = "Artifacts"
 FILE_NAME: str = "phisingData.csv"
-ARTIFACTS_DIR: str = "artifacts"   
- 
+
 TRAIN_FILE_NAME: str = "train.csv"
 TEST_FILE_NAME: str = "test.csv"
 
@@ -22,17 +18,11 @@ SAVED_MODEL_DIR =os.path.join("saved_models")
 MODEL_FILE_NAME = "model.pkl"
 
 
-"""
-This is the constant file for the project
-data ingestion constant start from "DATA_INGESTION" variable name: 
-    - collection name
-    - database name
-    - directory name
-    - feature store directory
-    - ingested directory
-    - train test split ratio
-"""
 
+
+"""
+Data Ingestion related constant start with DATA_INGESTION VAR NAME
+"""
 DATA_INGESTION_COLLECTION_NAME: str = "PhishingData"
 DATA_INGESTION_DATABASE_NAME: str = "NetworkSecurity"
 DATA_INGESTION_DIR_NAME: str = "data_ingestion"
@@ -50,7 +40,6 @@ DATA_VALIDATION_DRIFT_REPORT_DIR: str = "drift_report"
 DATA_VALIDATION_DRIFT_REPORT_FILE_NAME: str = "report.yaml"
 PREPROCESSING_OBJECT_FILE_NAME = "preprocessing.pkl"
 
-
 """
 Data Transformation related constant start with DATA_TRANSFORMATION VAR NAME
 """
@@ -67,3 +56,16 @@ DATA_TRANSFORMATION_IMPUTER_PARAMS: dict = {
 DATA_TRANSFORMATION_TRAIN_FILE_PATH: str = "train.npy"
 
 DATA_TRANSFORMATION_TEST_FILE_PATH: str = "test.npy"
+
+
+# """
+# Model Trainer ralated constant start with MODE TRAINER VAR NAME
+# """
+
+# MODEL_TRAINER_DIR_NAME: str = "model_trainer"
+# MODEL_TRAINER_TRAINED_MODEL_DIR: str = "trained_model"
+# MODEL_TRAINER_TRAINED_MODEL_NAME: str = "model.pkl"
+# MODEL_TRAINER_EXPECTED_SCORE: float = 0.6
+# MODEL_TRAINER_OVER_FIITING_UNDER_FITTING_THRESHOLD: float = 0.05
+
+# TRAINING_BUCKET_NAME = "netwworksecurity"
