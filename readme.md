@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 1. Create `.env` file with MongoDB credentials:
 ```env
-MONGODB_URL=mongodb+srv://your_username:your_password@etl-project.c7lnuue.mongodb.net/?appName=ETL-Project
+MONGODB_URL=mongodb+srv://your_username:your_password@your_server
 ```
 
 2. Install the project:
