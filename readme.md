@@ -257,13 +257,32 @@ Top features typically include:
 
 This project is licensed under the MIT License.
 
-## 📞 Support
+## 🔄 GitHub Actions Troubleshooting
+
+### Quick Fixes
+
+**MongoDB Error**: Add `MONGODB_URL` to repository secrets (Settings → Secrets)
+
+**Deprecated Actions**: Update workflow to use `@v4` versions
+
+**Permission Issues**: Add workflow permissions in YAML
+
+**Python Errors**: Check `requirements.txt` and run `pip install -e .`
+
+### Setup Required
+- Add `MONGODB_URL` secret to GitHub repository
+- Test locally: `python main.py`
+- Check workflow logs in Actions tab
+
+## �� Support
 
 For questions or issues:
 - Check logs in `logs/` directory
 - Verify MongoDB Atlas connection
 - Validate schema configuration
 - Ensure all dependencies are installed
+- Review GitHub Actions workflow logs
+- Check repository secrets configuration
 
 ---
 
