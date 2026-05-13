@@ -6,6 +6,7 @@ from NetworkSecurity.constant.training_pipeline import SCHEMA_FILE_PATH
 from NetworkSecurity.utils.main_utils.utils import read_yaml_file, write_yaml_file
 import sys
 import pandas as pd
+from typing import Optional
 
 from scipy.stats import ks_2samp
 import os, sys
@@ -157,10 +158,10 @@ class DataValidation:
             
             data_validation_artifact = DataValidationArtifact(
                 validation_status=validation_status,
-                valid_train_file_path=self.data_ingestion_artifact.train_file_path,
-                valid_test_file_path=self.data_ingestion_artifact.test_file_path,
-                invalid_train_file_path=None,
-                invalid_test_file_path=None,
+                valid_train_file_path=self.data_validation_config.valid_train_file_path,
+                valid_test_file_path=self.data_validation_config.valid_test_file_path,
+                invalid_train_file_path=optional(str),
+                invalid_test_file_path=optional(str),
                 drift_report_file_path=self.data_validation_config.drift_report_file_path,
             )
             return data_validation_artifact

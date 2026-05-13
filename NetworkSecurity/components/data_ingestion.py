@@ -96,7 +96,7 @@ class DataIngestion:
         try:
             logging.info("Performed train test split on the dataframe.")
             train_set, test_set = train_test_split(
-                dataframe, test_size=self.data_ingestion_config.train_test_split_ratio
+                dataframe, test_size=self.data_ingestion_config.train_test_split_ratio, random_state=42
             )
             logging.info("Exited split_data_as_train_test method of Data_Ingestion class.")
             
