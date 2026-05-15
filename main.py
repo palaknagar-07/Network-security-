@@ -1,10 +1,12 @@
 from NetworkSecurity.components.data_ingestion import DataIngestion
 from NetworkSecurity.logging.logger import logging
 from NetworkSecurity.exception.exception import NetworkSecurityException
-from NetworkSecurity.entity.config_entity import DataIngestionConfig, TrainingPipelineConfig, DataValidationConfig, DataTransformationConfig
+from NetworkSecurity.entity.config_entity import DataIngestionConfig, TrainingPipelineConfig, DataValidationConfig, DataTransformationConfig, ModelTrainerConfig
 from NetworkSecurity.components.data_validation import DataValidation
 from NetworkSecurity.components.data_transformation import DataTransformation
-from NetworkSecurity.entity.artifact_entity import DataIngestionArtifact
+from NetworkSecurity.components.model_trainer import ModelTrainer
+from NetworkSecurity.entity.artifact_entity import DataIngestionArtifact, ModelTrainerArtifact
+ 
 import sys
 
 
@@ -77,6 +79,22 @@ if __name__ == "__main__":
         logging.info(f"Preprocessor object path: {data_transformation_artifact.transformed_object_file_path}")
         
         
+        # Stage 5: Model Training
+        logging.info("-"*60)
+        logging.info("STAGE 5: MODEL TRAINING AND EVALUATION")
+        logging.info("-"*60)
+        model_trainer_config = ModelTrainerConfig(trainingpipelineconfig)
+        logging.info(f"Model directory: {model_trainer_config.model_trainer_dir}")
+        logging.info(f"Trained model path: {model_trainer_config.trained_model_file_path}")
+        
+        model_trainer = ModelTrainer(model_trainer_config=model_trainer_config, data_transformation_artifact=data_transformation_artifact)
+        logging.info("Starting model training process...")
+        model_trainer_artifact: ModelTrainerArtifact = model_trainer.initiate_model_trainer()
+        logging.info("Model training completed successfully")
+        logging.info(f"Trained model path: {model_trainer_artifact.trained_model_file_path}")
+        logging.info(f"Train metrics - F1: {model_trainer_artifact.train_metric_artifact.f1_score:.4f}")
+        logging.info(f"Test metrics - F1: {model_trainer_artifact.test_metric_artifact.f1_score:.4f}")
+        
         # Pipeline Completion Summary
         logging.info("="*80)
         logging.info("NETWORK SECURITY ML PIPELINE - EXECUTION COMPLETED")
@@ -85,9 +103,12 @@ if __name__ == "__main__":
         logging.info(f"  1. Data Ingestion: {dataingestionartifact.train_file_path}")
         logging.info(f"  2. Data Validation: Status = {data_validation_artifact.validation_status}")
         logging.info(f"  3. Data Transformation: {data_transformation_artifact.transformed_train_file_path}")
+        logging.info(f"  4. Model Training: {model_trainer_artifact.trained_model_file_path}")
+        logging.info(f"  5. Best Model F1 Score: {model_trainer_artifact.test_metric_artifact.f1_score:.4f}")
         logging.info("All pipeline stages completed successfully")
-        logging.info("Ready for model training phase")
+        logging.info("Model is ready for deployment")
         logging.info("="*80)
+
         
     except Exception as e:
         logging.error("="*80)
