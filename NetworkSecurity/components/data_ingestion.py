@@ -9,6 +9,7 @@ from NetworkSecurity.logging.logger import logging
 from NetworkSecurity.exception.exception import NetworkSecurityException
 from NetworkSecurity.entity.config_entity import DataIngestionConfig
 from NetworkSecurity.entity.artifact_entity import DataIngestionArtifact
+from NetworkSecurity.constant.training_pipeline import TARGET_COLUMN
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -45,7 +46,7 @@ class DataIngestion:
             # Test connection and list databases/collections
             databases = self.mongodb_client.list_database_names()
             logging.info(f"Available databases: {databases}")
-            print(f"Available databases: {databases}")  # Also print to console
+            
             
             if database_name in databases:
                 db = self.mongodb_client[database_name]
@@ -96,7 +97,10 @@ class DataIngestion:
         try:
             logging.info("Performed train test split on the dataframe.")
             train_set, test_set = train_test_split(
-                dataframe, test_size=self.data_ingestion_config.train_test_split_ratio, random_state=42
+                dataframe, 
+                test_size=self.data_ingestion_config.train_test_split_ratio, 
+                random_state=42, 
+                stratify=dataframe[TARGET_COLUMN]
             )
             logging.info("Exited split_data_as_train_test method of Data_Ingestion class.")
             

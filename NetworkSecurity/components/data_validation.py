@@ -4,9 +4,10 @@ from NetworkSecurity.entity.artifact_entity import DataIngestionArtifact, DataVa
 from NetworkSecurity.logging.logger import logging
 from NetworkSecurity.constant.training_pipeline import SCHEMA_FILE_PATH
 from NetworkSecurity.utils.main_utils.utils import read_yaml_file, write_yaml_file
+
 import sys
 import pandas as pd
-from typing import Optional
+
 
 from scipy.stats import ks_2samp
 import os, sys
@@ -28,7 +29,14 @@ class DataValidation:
             return pd.read_csv(file_path)
         except Exception as e:
             raise NetworkSecurityException(e,sys)
-
+    def isempty(self, df:pd.DataFrame) -> bool:
+        try:
+            if df.empty:
+                logging.error("Dataframe is empty")
+                return True
+            return False
+        except Exception as e:
+            raise NetworkSecurityException(e,sys)
 
     def validate_number_of_columns(self,df: pd.DataFrame) -> bool:
         try:
@@ -41,7 +49,7 @@ class DataValidation:
 
     def validate_numeric_columns_exist(self, df: pd.DataFrame) -> bool:
         try:
-            numeric_columns = self._schema_config.get("numeric_columns", [])
+            numeric_columns = self._schema_config.get("numerical_columns", [])
             logging.info(f"Required numeric columns: {numeric_columns}")
             
             for col in numeric_columns:
@@ -91,7 +99,29 @@ class DataValidation:
             return status
 
         except Exception as e:
-            raise NetworkSecurityException(e,sys)     
+            raise NetworkSecurityException(e,sys)  
+
+    def validate_column_names(self, df: pd.DataFrame) -> bool:
+        try:
+            schema_columns = [list(column.keys())[0] for column in self._schema_config["columns"]]
+            dataframe_columns = list(df.columns)
+
+            missing_columns = set(schema_columns) - set(dataframe_columns)
+            extra_columns = set(dataframe_columns) - set(schema_columns)
+
+            if missing_columns:
+                logging.error(f"Missing columns: {missing_columns}")
+                return False
+
+            if extra_columns:
+                logging.error(f"Extra columns: {extra_columns}")
+                return False
+
+            return True
+        except Exception as e:
+            raise NetworkSecurityException(e, sys)
+            
+
 
 
 
@@ -108,6 +138,14 @@ class DataValidation:
             ## validate number of columns
             validation_status = True
             error_message = ""
+
+            if self.isempty(train_dataframe):
+                validation_status = False
+                error_message += "Train dataframe is empty.\n"    
+
+            if self.isempty(test_dataframe):
+                validation_status = False
+                error_message += "Test dataframe is empty.\n"    
 
             status=self.validate_number_of_columns(df=train_dataframe)
             logging.info(f"Train dataframe column validation status: {status}")
@@ -134,6 +172,20 @@ class DataValidation:
                 validation_status = False
                 error_message += "Test dataframe missing required numeric columns.\n"
 
+            status = self.validate_column_names(df=train_dataframe)
+            logging.info(f"Train dataframe column name validation status: {status}")
+            if not status:
+                validation_status = False
+                error_message += "Train dataframe column names do not match schema.\n"
+
+            status = self.validate_column_names(df=test_dataframe)
+            logging.info(f"Test dataframe column name validation status: {status}")
+            if not status:
+                validation_status = False
+                error_message += "Test dataframe column names do not match schema.\n"
+    
+
+
             ## lets check datadrift
             drift_status=self.detect_dataset_drift(base_df=train_dataframe,current_df=test_dataframe)
             logging.info(f"Dataset drift detection status: {drift_status}")
@@ -144,6 +196,8 @@ class DataValidation:
             logging.info(f"Final validation status: {validation_status}")
             if error_message:
                 logging.error(f"Validation errors: {error_message}")
+
+            
 
             dir_path=os.path.dirname(self.data_validation_config.valid_train_file_path)
             os.makedirs(dir_path,exist_ok=True)
@@ -160,8 +214,8 @@ class DataValidation:
                 validation_status=validation_status,
                 valid_train_file_path=self.data_validation_config.valid_train_file_path,
                 valid_test_file_path=self.data_validation_config.valid_test_file_path,
-                invalid_train_file_path=optional(str),
-                invalid_test_file_path=optional(str),
+                invalid_train_file_path=None,
+                invalid_test_file_path=None,
                 drift_report_file_path=self.data_validation_config.drift_report_file_path,
             )
             return data_validation_artifact

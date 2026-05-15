@@ -4,15 +4,17 @@ import numpy as np
 """
 defining common constant variable for training pipeline
 """
+PROJECT_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
 TARGET_COLUMN = "Result"
 PIPELINE_NAME: str = "NetworkSecurity"
-ARTIFACT_DIR: str = "Artifacts"
+ARTIFACT_DIR: str = os.path.join(PROJECT_ROOT_DIR, "artifacts")
 FILE_NAME: str = "phisingData.csv"
 
 TRAIN_FILE_NAME: str = "train.csv"
 TEST_FILE_NAME: str = "test.csv"
 
-SCHEMA_FILE_PATH = os.path.join("data_schema", "schema.yaml")
+SCHEMA_FILE_PATH = os.path.join(PROJECT_ROOT_DIR, "data_schema", "schema.yaml")
 
 SAVED_MODEL_DIR =os.path.join("saved_models")
 MODEL_FILE_NAME = "model.pkl"

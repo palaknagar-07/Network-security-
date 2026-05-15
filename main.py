@@ -37,7 +37,7 @@ if __name__ == "__main__":
         logging.info("Data ingestion completed successfully")
         logging.info(f"Training data path: {dataingestionartifact.train_file_path}")
         logging.info(f"Testing data path: {dataingestionartifact.test_file_path}")
-        print(dataingestionartifact)
+        
         
         # Stage 3: Data Validation
         logging.info("-"*60)
@@ -54,7 +54,12 @@ if __name__ == "__main__":
         logging.info("Data validation completed")
         logging.info(f"Validation status: {data_validation_artifact.validation_status}")
         logging.info(f"Drift report path: {data_validation_artifact.drift_report_file_path}")
-        print(data_validation_artifact)
+        if not data_validation_artifact.validation_status:
+            raise ValueError(
+                "Data validation failed. Stopping pipeline before data transformation."
+            )
+
+        
         
         # Stage 4: Data Transformation
         logging.info("-"*60)
@@ -70,7 +75,7 @@ if __name__ == "__main__":
         data_transformation_artifact=data_transformation.initiate_data_transformation()
         logging.info("Data transformation completed successfully")
         logging.info(f"Preprocessor object path: {data_transformation_artifact.transformed_object_file_path}")
-        print(data_transformation_artifact)
+        
         
         # Pipeline Completion Summary
         logging.info("="*80)
