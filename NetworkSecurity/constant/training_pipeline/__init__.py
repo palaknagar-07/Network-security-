@@ -9,6 +9,8 @@ PROJECT_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 TARGET_COLUMN = "Result"
 PIPELINE_NAME: str = "NetworkSecurity"
 ARTIFACT_DIR: str = os.path.join(PROJECT_ROOT_DIR, "artifacts")
+MLFLOW_TRACKING_URI: str = f"sqlite:///{os.path.join(PROJECT_ROOT_DIR, 'mlflow.db')}"
+MLFLOW_EXPERIMENT_NAME: str = "NetworkSecurity"
 FILE_NAME: str = "phisingData.csv"
 
 TRAIN_FILE_NAME: str = "train.csv"

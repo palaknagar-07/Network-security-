@@ -1,8 +1,10 @@
 import sys
 import os
+import mlflow
 from NetworkSecurity.entity.config_entity import ModelTrainerConfig
 from NetworkSecurity.exception.exception import NetworkSecurityException
 from NetworkSecurity.logging.logger import logging
+from NetworkSecurity.constant.training_pipeline import MLFLOW_EXPERIMENT_NAME, MLFLOW_TRACKING_URI
 from NetworkSecurity.entity.artifact_entity import ModelTrainerArtifact, DataTransformationArtifact
 from NetworkSecurity.utils.ml_utils.model.estimator import NetworkModel
 from NetworkSecurity.utils.main_utils.utils import save_object, load_object
@@ -25,6 +27,23 @@ class ModelTrainer:
             self.data_transformation_artifact = data_transformation_artifact
         except Exception as e:
             raise NetworkSecurityException(e, sys)
+
+    def track_mlflow(self, best_model, train_metric, test_metric, best_model_name: str):
+        # mlflow.set_registry_uri("https://dagshub.com/krishnaik06/networksecurity.mlflow")
+        # tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
+        with mlflow.start_run():
+            mlflow.log_param("best_model", best_model_name)
+            mlflow.log_metric("train_f1_score", train_metric.f1_score)
+            mlflow.log_metric("train_precision", train_metric.precision_score)
+            mlflow.log_metric("train_recall_score", train_metric.recall_score)
+            mlflow.log_metric("test_f1_score", test_metric.f1_score)
+            mlflow.log_metric("test_precision", test_metric.precision_score)
+            mlflow.log_metric("test_recall_score", test_metric.recall_score)
+            mlflow.sklearn.log_model(best_model, "model")
+            
+
     def train_model(self, X_train, y_train, x_test, y_test):
         logging.info("ENTERED MODEL TRAINING MODULE")
         try:
@@ -44,17 +63,17 @@ class ModelTrainer:
                     'criterion': ['gini', 'entropy', 'log_loss'],
                 },
                 "Random Forest": {
-                    'n_estimators': [8, 16, 32, 128, 256]
+                    'n_estimators': [8, 16, 32, 256]
                 },
                 "Gradient Boosting": {
-                    'learning_rate': [.1, .01, .05, .001],
-                    'subsample': [0.6, 0.7, 0.75, 0.85, 0.9],
-                    'n_estimators': [8, 16, 32, 64, 128, 256]
+                    'learning_rate': [.1, .01, .001],
+                    'subsample': [0.6, 0.75, 0.85, 0.9],
+                    'n_estimators': [8, 16, 32, 64, 256]
                 },
                 "Logistic Regression": {},
                 "AdaBoost": {
                     'learning_rate': [.1, .01, .001],
-                    'n_estimators': [8, 16, 32, 64, 128, 256]
+                    'n_estimators': [ 32, 64, 256]
                 }
             }
             logging.info("Hyperparameter grids configured for all models")
@@ -93,6 +112,13 @@ class ModelTrainer:
             logging.info(f"Test metrics - F1: {classification_test_metric.f1_score:.4f}, "
                        f"Precision: {classification_test_metric.precision_score:.4f}, "
                        f"Recall: {classification_test_metric.recall_score:.4f}")
+
+            self.track_mlflow(
+                best_model=best_model,
+                train_metric=classification_train_metric,
+                test_metric=classification_test_metric,
+                best_model_name=best_model_name,
+            )
 
             logging.info("STEP 6: Loading preprocessor object")
             preprocessor = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)

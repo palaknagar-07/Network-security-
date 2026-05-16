@@ -8,4 +8,5 @@ certifi
 scipy
 dill
 pyyaml
+mlflow
 -e .
