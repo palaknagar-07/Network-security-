@@ -1,10 +1,10 @@
 import sys
 import os
-import mlflow
+
 from NetworkSecurity.entity.config_entity import ModelTrainerConfig
 from NetworkSecurity.exception.exception import NetworkSecurityException
 from NetworkSecurity.logging.logger import logging
-from NetworkSecurity.constant.training_pipeline import MLFLOW_EXPERIMENT_NAME, MLFLOW_TRACKING_URI
+from NetworkSecurity.constant.training_pipeline import MLFLOW_EXPERIMENT_NAME
 from NetworkSecurity.entity.artifact_entity import ModelTrainerArtifact, DataTransformationArtifact
 from NetworkSecurity.utils.ml_utils.model.estimator import NetworkModel
 from NetworkSecurity.utils.main_utils.utils import save_object, load_object
@@ -19,6 +19,10 @@ from sklearn.ensemble import (
     GradientBoostingClassifier,
     RandomForestClassifier,
 )
+import mlflow
+import dagshub
+
+
 
 class ModelTrainer:
     def __init__(self, model_trainer_config: ModelTrainerConfig, data_transformation_artifact: DataTransformationArtifact):
@@ -29,9 +33,7 @@ class ModelTrainer:
             raise NetworkSecurityException(e, sys)
 
     def track_mlflow(self, best_model, train_metric, test_metric, best_model_name: str):
-        # mlflow.set_registry_uri("https://dagshub.com/krishnaik06/networksecurity.mlflow")
-        # tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
-        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        dagshub.init(repo_owner="palaknagar-07", repo_name="Network-security", mlflow=True)
         mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
         with mlflow.start_run():
             mlflow.log_param("best_model", best_model_name)
@@ -42,7 +44,7 @@ class ModelTrainer:
             mlflow.log_metric("test_precision", test_metric.precision_score)
             mlflow.log_metric("test_recall_score", test_metric.recall_score)
             mlflow.sklearn.log_model(best_model, "model")
-            
+           
 
     def train_model(self, X_train, y_train, x_test, y_test):
         logging.info("ENTERED MODEL TRAINING MODULE")
@@ -73,7 +75,7 @@ class ModelTrainer:
                 "Logistic Regression": {},
                 "AdaBoost": {
                     'learning_rate': [.1, .01, .001],
-                    'n_estimators': [ 32, 64, 256]
+                    'n_estimators': [8, 16, 32, 64, 256]
                 }
             }
             logging.info("Hyperparameter grids configured for all models")
@@ -132,6 +134,11 @@ class ModelTrainer:
             Network_Model = NetworkModel(preprocessor=preprocessor, model=best_model)
             save_object(self.model_trainer_config.trained_model_file_path, obj=Network_Model)
             logging.info(f"Trained model saved to: {self.model_trainer_config.trained_model_file_path}")
+
+
+            save_object("final_model/model.pkl", best_model)
+
+
 
             # Model Trainer Artifact
             logging.info("STEP 8: Creating model trainer artifact")
