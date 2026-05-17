@@ -23,7 +23,7 @@ def get_requirements(file_path:str)-> List[str]:
     except FileNotFoundError:
         print(f"Error: requirements.txt not found at {file_path}")
 
-    print(requirements) 
+    return requirements
         
 
 
@@ -35,4 +35,3 @@ setup(
     packages=find_packages(),
     install_requires=get_requirements('requirements.txt')
 )
-
